@@ -1,0 +1,43 @@
+LC: https://leetcode.com/problems/maximum-subgraph-score-in-a-tree/description/
+
+class Solution {
+public:
+    vector<int> dp,ans;
+    void dfs(int i,int parent, vector<vector<int>>& edges,vector<int>& good){
+        dp[i] = (good[i] == 0) ? -1 : 1;
+        for(auto x: edges[i]){
+            if(x != parent){
+                dfs(x, i,edges, good);
+                dp[i] += max(0,dp[x]);
+            }
+        }
+    }
+
+    void dfs1(int i,int parent, vector<vector<int>>& edges){
+        if(parent != -1){
+            ans[i] = max(dp[i], dp[i] >= 0 ? ans[parent] : ans[parent] - 1);
+        }
+        for(auto x: edges[i]){
+            if(x != parent){
+                dfs1(x, i,edges);
+            }
+        }
+    }
+
+
+
+    vector<int> maxSubgraphScore(int n, vector<vector<int>>& edges, vector<int>& good) {
+        vector<vector<int>> temp(n);
+        dp.assign(n,0);
+        ans.assign(n,0);
+        for(auto x: edges){
+            temp[x[0]].push_back(x[1]);
+            temp[x[1]].push_back(x[0]);
+        }
+        dfs(0, -1, temp, good);
+        ans[0] = dp[0];
+        dfs1(0, -1, temp);
+        return ans;
+
+    }
+};
